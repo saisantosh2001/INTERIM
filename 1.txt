@@ -1,0 +1,512 @@
+Abend -
+An unexpected or abnormal termination of the program due to some problem
+in code or data.
+
+Statement -
+Individual instructions or commands in COBOL, like MOVE, ADD, DISPLAY, etc.
+
+Sentence -
+Groups of COBOL statements ending in a period.
+
+Delimiter -
+A delimiter is used to specify the start or end of the strings. 
+Example - single quote, double quote.
+
+Scope Terminator -
+Scoper terminator is a COBOL reserved word that specifies the end
+of the specific COBOL statements.
+
+Physical File -
+The physical file contains the data in the form of records.
+
+Logical File -
+The logical file is the name that uses to refer the physical 
+file in the program.
+
+Copybook -
+The copybook is a file structure in the form of variables declaration.
+
+Array | Table -
+The array is a set of similar elements arranged in sequential order 
+and can access with their position. It is also called as Table in COBOL.
+
+Binary Search -
+Binary search is an algorithm used on sorted arrays to search the element 
+quickly. The binary search uses the technique of repeatedly dividing the 
+Qentire array into two parts until found the element.
+
+IDENTIFICATION DIVISION.
+PROGRMA-ID. ABC.
+ENVIRONMENT DIVISION.
+CONFIGURATION SECTION.
+INPUT-OUTPUT SECTION.
+FILE-CONTROL.
+DATA DIVISION.
+FILE SECTION.
+   FD|SD (PHYSICAL OR SORT FILES)
+WORKING-STORAGE SECTION.
+LINKAGE SECTION.
+PROCEDURE DIVISION.
+
+USING parameter - It is optional. When a program can be CALLED from another
+program, we use the USING clause to pass data between them. The parameters 
+correspond to the LINKAGE SECTION entries.
+
+All statements should be coded in Area-B in the PROCEDURE DIVISION and is 
+marked with a period(.) at the end.
+
+INDICATOR AREA(COL 7)  * COMMENTS
+                       - CONTINUATION
+                       / PRINT STOPPER
+                       D DEBUGGING INDICATOR
+
+SRCLIB R800
+LOADLIB R80 B6144
+COPYLIB R80
+
+IGYCRCTL in IGY420.SIGYCOMP
+IEWBLINK in CEE.SCEELKED
+
+COB COMP
+//TECN179A    JOB    NOTIFY=&SYSUID
+//JOBPROC     JCLLIB ORDER=IBMUSER.ALL1
+//COBCL       EXEC   IGYWCL,
+//              PGMLIB=(LOADLIB NAME),
+//              COPYLIB=(COPYLIB),
+//              GOPGM=(PGMNAME)
+//COBOL.SYSIN DD     DSN=(SRCLIB),DISP=SHR
+//LKED.SYSLIB DD DSN=TECN179.COBOL.LOADLIB(CA21G179),DISP=SHR
+
+COB RUN
+//TECN179A    JOB    NOTIFY=&SYSUID
+//RUN         EXEC   PGM=PGMNAME
+//STEPLIB     DD     DSN=LOADLIB NAME
+//SYSPRINT    DD     SYSOUT=*
+//SYSIN       DD     *
+
+LEVEL NUMBER- SPECIFIES THE HIERARCHY OF DATA ITEMS OR VARIABLES.
+01 to 49- General purpose level numbers are used for regular 
+          variables declaration.
+66 -      used to give different names to existing data items. 
+          It is used to re-group the data names and give a new name to them.
+          66 WS-NEW RENAMES WS-A THRU WS-C.
+
+77 -      It is used to declare the individual variables. 
+          It's not part of any hierarchical structure and doesn't 
+          subordinate other variables.
+
+88 -      It defines a condition name for a specific value or a 
+          set of values under the variable.
+
+data items- individual, group, elementary
+
+The PICTURE clause is used to specify the characteristics of the variable
+
+STRING HANDLING:
+
+STRING: To concatenate the contents of 2 or more variables.
+        STRING var1[delimited] var 2[delimited] INTO var 3 END-STRING.
+
+UNSTRING: break into multiple vars.
+          UNSTRING var INTO var1 var2 var3 END-UNSTRING.
+
+TALLYING IN - Used to count the number of characters that have been 
+transferred to the target fields.
+
+INSPECT var TALLYING var FOR [ALL/LEADING] var
+INSPECT var replacing var [ALL/LEADING] var by var
+
+PERFORM (INLINE/OUTLINE): END-PERFORM is the difference. also control 
+ transfer.
+PERFORM VARYING var FROM 1 BY 1 UNTIL cond.
+
+DIVIDE var INTO var GIVING var ROUNDED REMAINDER var END-DIVIDE.
+
+Array is a collection of individual data items of same type and length.
+IDENTICAL DATA STORED MULTIPLE TIMES
+
+OCCURS is used to declare a table.
+01 TABLE-NAME.
+    02 record/row-name PIC X(1) OCCURES 10 TIMES INDEXED BY index name  
+                                                ===> 10 rows in the table
+
+SUBSCRIPT: Used to access data from table, represents the number of table
+ occurences(i.e, represents the row number) automatically created with the
+ OCCURS clause, requires a seperate WS var with S9(04) COMP.
+ to display 2nd row of Table: A with row named as WS-ROW1 where occurs 
+ clause is present: DISPLAY WS-ROW1(subscript_var/ row number directly).
+
+INDEX: It refers to a table elemnts as the number of positions it has 
+ displaced from the starting pos. increment or decrement is done by SET.
+ 03 var OCCURS 2 TIMES INDEXED BY var1.
+ now to use index variable var1 and obtain the 2nd row of the table 
+ SET var1 TO 2.          ===> SET is used to initialize and inc or dec 
+                           the values of table index.(SET var UP/DOWN BY 1)
+ DISPLAY rowname(var1).
+
+SEARCH: To perform a linear search on the array, works with tables having
+ OCCURS clause and are INDEXED with an index. Also called sequential search
+ example: Table name: ABC, row name: DEF, grp elements of DEF are GH,IJ,KL.
+ initialize index.
+ SEARCH ABC VARYING indexname AT END statements WHEN GH(index) = '001' 
+    statements END-SEARCH.
+   All instances are obtained
+
+SEARCH ALL: To perform binary search on the array, more efficient,
+ table should be in sorted order
+ same case as above example: SEARCH ALL ABC AT END statements
+                             WHEN condition statements END-SEARCH.
+  Only first occurance checked for.
+
+Memory management: 
+   REDEFINES: Allows one var to share the same storage area as another var.
+      Both should have same level number,
+      Suppose we have      A PIC X(20)
+                           B REDEFINES A PIC X(5).
+            Now A and B share same memory locn, If A= 'ABCDEFGHIJ'
+                                B will be equal to B='ABCDE'
+      Suppose we move 'ABCDEFGHIJKLMNO' to B then B= 'ABCDE' and
+                                                  A= 'ABCDEFGHIJKLMNO' 
+              This happens as both have same meory locn but diff PIC.
+
+   RENAMES: To define an alternative name to an existing grp of elemnts.
+           Level 66.
+      Suppose we have Var ABC with grp variables (A,B,C,D,E,F,G,H).
+      We write: 66 VAR1 RENAMES A THRU D.
+                DISPLAY VAR1  ===> This will display A,B,C,D.
+                   Giving a name to a set of variables.
+   SYNCHRONIZED: To remove slack bytes. Keyword: SYNC after PIC.
+
+   COMP: To specify the internal representation of the variables.
+        defined with USAGE clause.
+        DISPLAY : by default used, uses character form, one display is
+                  1 byte(8 bits) of storage.
+        COMP: is of BINARY form, to store signed decimal numbers in pure 
+              binary format, only for numeric items. efficient storage and
+              fast computation. (PIC (1 to 4) 2 bytes (half word)
+                                     (5 to 9) 4 bytes (full word)
+                                     (10 to 18) 8 bytes (double word)
+                EX: 05 WS-VAR PIC 9(5) USAGE IS COMP. ===> occupies 4 bytes
+        COMP-1:Used to store single precision(32 bits) floating point 
+               numbers  No pic clause, has 4 bytes  
+        COMP-2:Used to store internal double-precision(64 bits) floating
+               point numbers  No pic clause, has 8 bytes
+        COMP-3: Used for Packed decimal in a binary coded decimal form.
+                Half byte for each digit include sign and will be whole num
+
+Access Modes: INPUT: For reading only
+              OUTPUT: For writing only, If file exists, overwritten.
+              I-O: both  read and write, used for updating purposes.
+              EXTEND: Appending records to an existing file, on for 
+                  Sequential access files.
+ REWRITE: to update an already read record, REWRITE rec-name
+ DELETE: to delete a record based on the key, DELETE rec-name
+ here in rec-name the key field should have th value which is to be deleted
+ START:  To set the pointer at a specifieed locn, START file-name KEY IS
+ next record: to read through all records and perform a task.
+
+STATIC call: subprog name in quotes and the load module of subprog is attached
+ to mainfprog during compile itself
+DYNAMIC call: subprog name given in a var, and load modules of both stored 
+ seperately and not linked. Need to use DYNAM compiler option while 
+ compiling for main prog.
+
+BY REFERENCE: default, to pass memory locn of actual data and not a copy data
+ modifications in values of var in sub prog reflected in main prog
+BY CONTENT:  To pass a copy of data to subprog, modofocations in sub dont
+ reflect in mainprog.
+
+STOP RUN: Terminate the exicutuion of the program.
+EXIT: to mark the end of called prog
+GO BACK: Logical end of prog and gives control back from where it received.
+GO TO: To transfer control to a different part of the prog
+
+SUBROUTINE: INTERNAL(Anything after the STOPRUN and called using PERFORM)
+        and EXTERNAL( SUB PROGRAM and Copybooks).
+
+SUB PROGRAM: seperate modules coded to perform a specific task and can
+  be used by multiple progs.
+
+PROCEDURE DIVISION copybooks: These paras or sections added during 
+ compilation INCLUDE statement can be used to insert a code into a source
+ code
+
+ Diff of Copybooks and Subprograms: Copy books simply include the code in
+  source code whereas sub program  is linked tto main prog at compile or
+  run satge and can recive vars from main prog.
+
+
+DB2
+
+DB2 storage structure is made of VSAM files.
+Table spaces and Index spaces
+Table space is divided into equal parts called as pages.
+
+Pre compile jcl has precompile step + cobol compile jcl.
+ it divides the cobol+db2 source code and divide in into 
+ COBOL loadlib and DBRM.
+PRECOMPILE CHECKS THE DB2 STATEMENTS BEFORE PLACING THEM IN DBRM
+  (database request module). used to generate time stamp tokens of cob,db2
+timestamps are validated during the BIND process.
+
+DBRM contains the syntax verified SQL statements in a pds.
+
+BIND: Process to find an optimized path to retrieve the data from db2 FOR
+ THE SQL's DBRM as input, utility is IKJEFT01, BIND is to specify isolation
+ levels.
+
+Package: Intermediate component between DBRM and PLAN, Non executable,
+ Contains optimized path
+Plan: Contains optimized path but is executable, has the best
+ optimized path to obtain data from the database
+
+DBRM shoul be bound to a package of plan.
+Bind program creates a connection between application program and 
+ its database
+
+Isolation how the program is isolated for accessing the database
+ that is accessed by other programs concurrently( Multiple users
+ can access the db at the same time)
+           Cursor Stability: Locks one page of a record,
+               released after the transaction is complete, 
+               Locks the record being referenced.
+           Repeatable Read:
+           Read Stability:
+           Uncommitted Read/ Dirty Read:
+
+Determines for how much time the the program bound to the
+ package can be isolated from the effect of other programs
+
+JCL Job Control Language
+
+JCL tells the z/OS to do a particular work or execute a pgm.
+ defining and controlling the pgm execution, input details etc.
+ provieds a set of instructions to mainframe to perform a task.
+
+JES(Job Entry Subsystem) uses the JCL instructions to instruct the system
+ on how to run a batch job.
+
+Pass values to a application program using PARM in EXEC.
+
+//     ---> Null indicator
+* in 3 ---> For Comments
+3 to 10 ---name field
+11 space
+12 to 15 operation field (JOB/EXEC/DD)
+16 space
+17 to 71 operands
+
+There should be no space between parameters.
+
+JOB statement/card - mkae the OS aware abt the job and its parameters.
+EXEC statement - 255 possible
+DD statement - each exec can have 255.
+
+JES receives the jobs and run/schedule them and manage output, replace 
+ the procs, symbolic parameters make it execution ready.
+ execution priority based on CLASS and PRTY.
+PURGE- when JOB is completed the resources and space allocated are released.
+
+step level parameters take priority.
+Positional Parameters- parameters are very specific about their positions.
+ Accounting and programmer info.
+Keyword Parameters- Used by the JES.
+   CLASS- To classify the jobs based on how long they take execute.
+   MSGCLASS- to specify the output device where the msgs are to be displayed.
+   MSGLEVEL- Control the printing of job.(stmt(0(Job only),1(All),2(JCL only)),
+    exec(0(abnormal end),1(everytime)).
+   PRTY: When same class
+   TIME: To specify the max CPU time allowed for the job,
+       NOLIMIT, 1440 (means 24hrs), MAX (248.55 days)
+   REGION: Amt of memory required to execute the job, assigned to each step.
+       100K OR 100M
+   NOTIFY: Job status shared as nitification
+   RESTART: From a step or proc.
+   COND: Validate RC. 0 to 4095, Operator GT,GE,EQ,LT,LE,NE.
+   TYPERUN: to scan for syntax errors and library errors.
+
+EXEC: Begining of a step.
+   PGM: 
+   PROC: 
+   DYNAMBR: Holds the number of dataset allocations for reuse,
+     Tells the number of number of resources in anticipation of reuse.
+   PARM: To pass the input data to the program.
+   DSN:
+   DISP: NEW: Create new
+         SHR: Already exists, used only as read
+         OLD: Already exists, has exclusive control on the dsn
+         MOD: Exists already and to append the data existing
+      ACTION:
+         KEEP, CATLG, UNCATLG, PASS, DELETE 
+  SYSOUT: Specify the destination of system output
+
+STEPLIB AND JOBLIB: Libraries where the sytem will find for the
+ load modules while execution of the job.
+JCLLIB: Private libraries containing the Catalogued procedures.
+COPYLIB/SYSLIB: copybook library.
+
+SYSIN: Provide control statements or data to program.
+COND=ONLY only at step level, only when step preceding fails
+COND=EVEN only at step level, any case execute
+
+RC: 0: Normal completion
+    4: Minor Error
+    8: Major error, some statements bypassed
+   12: Logical error, inconsistent parameters
+   16: Severe Error, 
+
+IDCAMS: Access Method Services, Used to create modify delete VSAM datasets 
+ SYSPRINT & SYSIN
+     REPRO: Copy files, Convert seq to VSAM and vice versa, backup of vsams
+     PRINT, LISTCAT, DELETE, ALTER, BLDINDEX
+
+DEFINE CLUSTER: Create vsams
+
+DB2
+
+DDL: Data Definition Language(Create, Alter, Drop)
+DML: Data Manipulation Language(Select, Delete, Insert, Update)
+TCL: Transaction Control Language(Commit, Rollback)
+DCL: Data Control Language(Grant, Revoke)
+
+Foreign Key: REFERENCES
+  ON DELETE RESTRICT: not allowed to delete parent if child is there
+  ON DELETE CASCADE: Deletes both parent and child
+  SET TO NULL: on deletion of parent, makes child null.
+
+CREATE TABLE tname
+          ( col1 INTEGER NOT NULL PRIMARY KEY,
+            col2 VARCHAR NULL,
+            col3 CHAR(10) NOT NULL FOREIGH KEY REFERENCES tname2(col name)
+                       ON DELETE DELETE/CASCADE/ SET NULL
+                       ON UPDATE NO ACTION/RESTRICT 
+         )
+ALTER TABLE tname( ADD col-def
+                   ALTER COLUMN colname SET DATA TYPE( new dtype)
+                   RENAME COLUMN col TO col )
+
+CREATE  [UNIIQUE] INDEX indexname ON tab-name(col-name[ASC/DESC])
+
+DROP VIEW/TABLE/INDEX/ALIAS/SYNOMYM/TABLESPACE
+
+SELECT DISTINCT col1, col2,.....FROM table
+
+SELECT cols FROM tab WHERE condition(+, <,>,!=, !<(Not less than),
+               <>(nonequality), BETWEEN, IN (), IS NULL) AND/OR cond2
+
+SELECT .. FROM .. ORDER BY col1, col2, col3 ASC/DESC;
+
+INSERT INTO tabname(col1,col2,col3) VALUES (val1,val2,val3)
+
+UPDATE table SET col1-val1, col2=val2 WHERE condition
+
+DELETE FROM table WHERE condition;
+
+SELECT ... FROM .... LIMIT n [OFFSET m] / FETCH {FIRST/next} 
+                                         m {row/rows} ONLY(only for fetch)
+
+AVG(), COUNT(), MIN(), MAX(), SUM()  Aggregate Function
+
+LENGHT(), LOWER(), LTRIM(), SUNSTR(col1, strt, len)
+
+SELECT .. FROM .. WHERE col LIKE pattern(uses '%'(zero or more)/'_'(single))
+
+SELECT .. FROM .. WHERE col [NOT] IN (list of values/SELECT statement)
+
+SELECT CONCAT(col1, col2) FROM.....
+SELECT col1 || col2 FROM....
+
+SELECT col AS alias FROM table AS alias
+
+SELECT col1, col2, col3 FROM tab1 INNER JOIN/ FULL OUTER JOIN
+                                                       tab2 ON col1=col2
+
+multiple SELECT statements can be specified using UNION: removes duplicates
+                                             UNION ALL: returns all
+
+GROUP BY
+
+S9(8)COMP INTEGER
+S9(4)COMP SMALLINT
+X(n)      NUM(n)
+S9(m)V9(n)COMP-3 DECIMAL(m,n)
+X(n) CHAR(n)
+X(n)+2  VARCHAR(n)
+
+SQLCA SQL Communication Area:v Contains all info like return
+ code, error details after db2 query execution
+SQLERRM, SQLCODE, SQLERRD(Number of rows executed by the operation)
+
+STORAGE GRP-->DATABASE-->TABLESPACE & INDEX SPACE-------
+------------------------>TABLE      & INDEX
+View, Alias, Synonym, Column, Row
+
+Relational Databse: A collection of logically related data arranged
+ in multiple tables.
+
+Tablespace: Collection of multiple tables.
+     Simple Table Space: Here TS is divided pages withoutany higher level 
+         structure
+     Segmented Table Space: Here TS is divided into equal sized group of
+         pages called segements, Each segement contains data from only one
+         table
+     Partitioned Table Space: TS divided into units called partitions,
+         each containing a part of one table
+
+Index Space: where all indexes are stored.
+      Index: A data access aid, that is created on an table.
+             acts like a pointer to a rows in a table. 
+             index is a seperate object from the table. Access structure
+
+View: Provides a different way of looking at the data in a table.
+      Never stores any data anyhwere newly or occupies any space.
+      Control access to sensitive data
+        CREATE VIEW viewname AS query
+        SELECT * FROM viewname
+
+Synonym: An alternative, private name for a table or view.
+         Can be used by only an individual who creates it.
+         When a table is dropped all synonyms are dropped.
+
+Alias: universal, when table dropped alias not dropped
+
+Buffer Pool: Area of virtual storage where db2 temporarily stores
+ pages of tables spaces or indeexes.
+ Improve performance as loads faster, default bufferpool is BP0
+
+Normalization: design approach to minimize data redundancy(storing same data
+in multiple tables) and optimizes data structures, decomposing large tables
+ into smaller tables.
+
+Locks are used to prevent other user from accessing data from a table which
+ has changes undergone by other user but not commited yet
+
+SPUFI: SQL Processor using File Input:
+QMF: Query Management Facility: Interactive tool
+
+TSO: Time Sharing Option
+ISPF: Interactive System Productivity Facility
+
+ISOLATION LEVEL: When an application is accessing a database, isolation
+ levels determine the degree to which data is locked for other concurrent
+ applications.
+ Its an attribute of the package and is given during BIND
+ Isolation levells are enforced using locks-
+ Locks based on their type determine exetent to which access to data is
+  limited by concurrent applications
+ Share(S): Concurrent users are limited to read-only operations on data
+ Update(U): Limited to read only if user didnt declare that they would
+            make an update, Can update
+ Exclusive(X): prevented from accessing data, Not applicable for UR isolation
+ Size of a lock can be page, table, tablespace, Controlled by ACQUIRE, RELEASE, ISOLATION
+ LOCK TABLE tabname IN EXCLUSIVE/SHARE/UPDATE MODE
+ ISOLATION(CS) page lock held only when the cursor is positioned on that page
+ ISOLATION(RR) page lock is held till next sync stmt (COMMIT/ROLLBACK)
+
+ Precompiler scans the program and copies all the SQL statements and host variable info into 
+ into Database Request Module(DBRM), Also modifies the Source code into without sql
+
+ As DBRM is binded to produce a package which containes an optimized path to access the data
+ in tabel the best way., optimize sql, checks syntax
+ Plan is a collection of packages that the program is alowed to look into to find 
+ the package it requires

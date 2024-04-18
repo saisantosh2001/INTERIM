@@ -1,0 +1,23 @@
+//TECN179A JOB  NOTIFY=&SYSUID,                                         00010000
+//          CLASS=A,                                                    00020000
+//          MSGCLASS=A,                                                 00030000
+//          MSGLEVEL=(1,1)                                              00040000
+//STEP010  EXEC PGM=IDCAMS                                              00050000
+//SYSOUT   DD   SYSOUT=*                                                00060000
+//SYSIN    DD   *                                                       00070001
+ DELETE TECN179.L1G.AGTCMN.KSDS PURGE                                   00080001
+ IF LASTCC>0 THEN SET MAXCC=0                                           00090001
+ DEFINE CLUSTER (                   -                                   00100001
+ NAME(TECN179.L1G.AGTCMN.KSDS)      -                                   00110001
+ VOLUME(ZAPRD7)                     -                                   00120001
+ TRACKS(1,1)                        -                                   00130001
+ CISZ(4096)                         -                                   00140001
+ INDEXED                            -                                   00150001
+ KEYS(5,0)                          -                                   00160001
+ FREESPACE(10,10)                   -                                   00170001
+ RECORDSIZE(80,80)                  -                                   00180001
+ REUSE                              -                                   00190001
+ )                                                                      00200001
+/*                                                                      00210001
+//SYSPRINT DD   SYSOUT=*                                                00220001
+
